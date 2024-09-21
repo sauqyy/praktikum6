@@ -1,32 +1,104 @@
-<html>
-    <head>
-        <h1> My first Heading</h1>
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktikum Week 6</title>
+</head>
+<body>
 
-    <body>
-        <p> My first paragraph </p>
-        <p id="a"> TEXT </p>
-        <style>
-            #a
-            {
-                color: blue;
-                font-family: Calibri;
+    <div class="container">
+        <h1>Praktikum Week 6</h1>
+        <div class="button-file">
+            <input type="file" id="upload" accept=".xlsx, .xls">
+        </div>
+        <table id="excelDataTable"></table>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script>
+        const uploadInput = document.getElementById('upload');
+        const dataTable = document.getElementById('excelDataTable');
+
+
+        uploadInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    dataTable.innerHTML = '';
+
+                    jsonData.forEach((row, rowIndex) => {
+                        const rowElement = document.createElement('tr');
+                        row.forEach(cell => {
+                            const cellElement = rowIndex === 0 ? document.createElement('th') : document.createElement('td');
+                            cellElement.textContent = cell;
+                            rowElement.appendChild(cellElement);
+                        });
+                        dataTable.appendChild(rowElement);
+                    });
+                };
+
+                reader.readAsArrayBuffer(file);
             }
-        </style>
-        <p style ="text-align:justify;"> paragraph yang diantar CSS secara internal </p>
-       
-    </body>
-    <table>
-        <body>
-            <tr>
-                <td>Shady Grove</td>
-                <td>Aeolian</td>
-            </tr>
-            <tr>
-                <td>Over the River, Charlie</td>
-                <td>Dorian</td>
-            </tr>
-          
-        </body>
-    </table>
+        });
+    </script>
+</body>
+<style>
+    .button-file {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
+    }
+
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+        margin: 20px 0;
+        width: 100%;
+        align-items: center;
+        background-color: lightblue;
+        height: 50px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
 </html>
